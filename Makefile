@@ -41,11 +41,7 @@ example-loadbalancer:
 	@echo "Running load balancer example..."
 	@go run examples/loadbalancer/main.go
 
-example-visualize:
-	@echo "Running visualizer..."
-	@go run examples/visualize/main.go
-
-examples: example-basic example-loadbalancer example-visualize
+examples: example-basic example-loadbalancer
 
 # Format code
 fmt:
@@ -85,7 +81,6 @@ help:
 	@echo "  make run                - Build and run main demo"
 	@echo "  make example-basic      - Run basic usage example"
 	@echo "  make example-loadbalancer - Run load balancer example"
-	@echo "  make example-visualize  - Run ring visualizer"
 	@echo "  make examples           - Run all examples"
 	@echo "  make fmt                - Format code"
 	@echo "  make lint               - Lint code"

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"strings"
 
@@ -10,9 +11,8 @@ import (
 )
 
 func main() {
-	fmt.Println("🔷 smol-hash - Consistent Hashing with Bounded Loads")
-	fmt.Println("====================================================")
-
+	fmt.Println("smol-hash - Consistent Hashing with Bounded Loads")
+	fmt.Println(strings.Repeat("=", 50))
 	// Create a hash ring with default config
 	config := consistenthash.DefaultConfig()
 	ring := consistenthash.NewHashRing(config)
@@ -38,10 +38,10 @@ func main() {
 		node := consistenthash.NewNode(n.id, n.host)
 		err := ring.AddNode(node)
 		if err != nil {
-			fmt.Printf("❌ Error adding node %s: %v\n", n.id, err)
+			fmt.Printf("Error adding node %s: %v\n", n.id, err)
 			os.Exit(1)
 		}
-		fmt.Printf("  ✓ Added %s (%s)\n", n.id, n.host)
+		fmt.Printf("Added %s (%s)\n", n.id, n.host)
 	}
 
 	fmt.Println("\n" + strings.Repeat("=", 50))
@@ -52,11 +52,11 @@ func main() {
 	fmt.Println("\nDistributing 50 keys using standard GetNode()...")
 	distribution := make(map[string]int)
 
-	for i := 0; i < 50; i++ {
+	for i := range 50 {
 		key := fmt.Sprintf("user:%d", i)
 		node, err := ring.GetNode(key)
 		if err != nil {
-			fmt.Printf("❌ Error getting node for %s: %v\n", key, err)
+			fmt.Printf("Error getting node for %s: %v\n", key, err)
 			continue
 		}
 		distribution[node.ID]++
@@ -66,7 +66,7 @@ func main() {
 	}
 
 	if len(distribution) > 5 {
-		fmt.Printf("  ... (45 more keys)\n")
+		fmt.Printf("...(%d more keys)\n", 45)
 	}
 
 	fmt.Println("\nDistribution without bounded loads:")
@@ -86,11 +86,11 @@ func main() {
 	}
 
 	fmt.Println("\nDistributing 50 keys with bounded loads...")
-	for i := 0; i < 50; i++ {
+	for i := range 50 {
 		key := fmt.Sprintf("user:%d", i)
 		node, err := ring2.GetNodeWithBoundedLoad(key)
 		if err != nil {
-			fmt.Printf("❌ Error getting node for %s: %v\n", key, err)
+			fmt.Printf("Error getting node for %s: %v\n", key, err)
 			continue
 		}
 		if i < 5 {
@@ -100,7 +100,7 @@ func main() {
 	}
 
 	if len(distribution) > 5 {
-		fmt.Printf("  ... (45 more keys)\n")
+		fmt.Printf("...(%d more keys)\n", 45)
 	}
 
 	fmt.Println("\nDistribution with bounded loads:")
@@ -119,10 +119,10 @@ func main() {
 	fmt.Println("\nRemoving server3 to simulate failure...")
 	err := ring2.RemoveNode("server3")
 	if err != nil {
-		fmt.Printf("❌ Error removing node: %v\n", err)
+		fmt.Printf("Error removing node: %v\n", err)
 		os.Exit(1)
 	}
-	fmt.Println("  ✓ server3 removed")
+	fmt.Println("server3 removed")
 
 	fmt.Println("\nRedistribution after node removal:")
 	allNodes = ring2.GetNodes()
@@ -143,7 +143,7 @@ func main() {
 	jsonStats, _ := json.MarshalIndent(stats, "", "  ")
 	fmt.Println(string(jsonStats))
 
-	fmt.Println("\n✅ Demo completed successfully!")
+	fmt.Println("\nDemo completed successfully!")
 }
 
 // generateBar creates a simple text-based progress bar
@@ -152,17 +152,14 @@ func generateBar(current, max int) string {
 		return ""
 	}
 	barLength := 20
-	filled := int(float64(current) / float64(max) * float64(barLength))
-	if filled > barLength {
-		filled = barLength
-	}
+	filled := int(math.Min(float64(current)/float64(max)*float64(barLength), float64(barLength)))
 
 	bar := "["
-	for i := 0; i < barLength; i++ {
+	for i := range barLength {
 		if i < filled {
-			bar += "█"
+			bar += "■"
 		} else {
-			bar += "░"
+			bar += "□"
 		}
 	}
 	bar += "]"
